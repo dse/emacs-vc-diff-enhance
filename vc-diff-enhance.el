@@ -30,8 +30,7 @@
         (cond ((null curval) nil)
               ((and (listp curval) (member option curval)) t)
               ((and (stringp curval) (string-match option-regex curval)) t)
-              (t (message "A1")
-                 (apply #'vc-diff-enhance/includes-option-p curval (cdr options)))))
+              (t (apply #'vc-diff-enhance/includes-option-p curval (cdr options)))))
     nil))
 
 ;; doesn't handle values other than nil, a string, or a list
@@ -56,12 +55,10 @@
                            ((and (stringp curval) curval)
                             (replace-regexp-in-string option-regex "\\1\\2" curval))
                            (t curval))))
-        (message "A2")
         (apply #'vc-diff-enhance/remove-option result (cdr options)))
     curval))
 
 (defun vc-diff-enhance/append-option (curval &rest options)
-  (message "A3")
   (if (apply #'vc-diff-enhance/includes-option-p curval options)
       curval
     (vc-diff-enhance/append-option-unconditionally curval (car options))))
@@ -122,20 +119,16 @@
 
 ORIG-FUN is the original `vc-diff' function.
 HISTORIC and NOT-URGENT arguments are as in `vc-diff'."
-  (message "AA")
   (if (boundp 'vc-git-diff-switches)
       (let ((result)
             (vc-git-diff-switches vc-git-diff-switches))
-        (message "A")
         (if vc-diff--ignore-space
             (setq vc-git-diff-switches (vc-diff-enhance/append-ignore-white-space-options vc-git-diff-switches)))
         (if vc-diff--unignore-space
             (setq vc-git-diff-switches (vc-diff-enhance/remove-ignore-white-space-options vc-git-diff-switches)))
         (if vc-diff--word-diff
             (setq vc-git-diff-switches (vc-diff-enhance/append-word-diff-option vc-git-diff-switches)))
-        (message "B")
         (setq result (apply orig-fun args))
-        (message "C")
         (if vc-diff--word-diff
             (vc-diff-enhance/fix-word-diff-buffer))
         result)
